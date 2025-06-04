@@ -1,0 +1,64 @@
+/*@keyframes diagonal-drive {
+    0% {
+        transform: translate(100vw, 100vh) rotate(0deg);
+    }
+    100% {
+        transform: translate(-10vw, -10vh) rotate(-15deg);
+    }
+}
+*/
+:root {
+    --primary-color: #ffcc00; /* Yellow */
+    --secondary-color: #343a40; /* Dark */
+    --text-color: #212529; /* Black */
+    --background-color: #f8f9fa; /* Light gray */
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    color: var(--text-color);
+    background-color: var(--background-color);
+}
+
+/*.taxi-animation {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    width: 150px;  //Adjust size as needed 
+    animation: diagonal-drive 3s ease-in-out;
+    animation-fill-mode: forwards;
+}
+ Button Styling */
+.btn-custom {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 25px;
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+.btn-custom:hover {
+    background-color: #0056b3;
+    transform: scale(1.1);
+}
+/* Navbar Styling */
+.navbar-custom {
+    background-color: #343a40;
+    padding: 10px 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-custom a {
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 18px;
+    margin: 0 10px;
+    transition: color 0.3s ease;
+}
+
+.navbar-custom a:hover {
+    color: #8a2be2; /* Violet color */
+}

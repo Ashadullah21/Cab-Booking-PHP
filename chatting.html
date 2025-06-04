@@ -1,0 +1,396 @@
+<?php require_once('./config.php'); ?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<?php require_once('inc/header.php'); ?>
+<title>Kupido Cab Booking System</title>
+<style>
+/* General Body Styling */
+
+body {
+    background-image: url('uploads/bgcab2.jpg');
+    background-attachment: fixed;
+    background-size: cover;
+    background-position: center;
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+/* Kupido Chatbot Container */
+#kupido-container {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 450px;
+    background: rgba(106, 13, 173, 0.95);
+    color: white;
+    border-radius: 20px;
+    box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(10px);
+    display: none;
+    z-index: 1000;
+    margin-bottom: 150px;
+    overflow: hidden;
+    animation: slideUp 0.5s ease;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translate(-50%, 100%);
+    }
+    to {
+        transform: translate(-50%, 0);
+    }
+}
+
+/* Chat Header */
+#kupido-header {
+    background: rgba(75, 0, 130, 0.95);
+    padding: 15px;
+    text-align: center;
+    font-size: 18px;
+    font-weight: bold;
+    border-radius: 20px 20px 0 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#kupido-header span {
+    cursor: pointer;
+    font-size: 20px;
+    transition: transform 0.2s ease;
+    color: white;
+}
+
+#kupido-header span:hover {
+    transform: scale(1.2);
+}
+
+/* Chat Body */
+#kupido-body {
+    height: 350px;
+    overflow-y: auto;
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.9);
+    color: #333;
+    font-size: 14px;
+    border-bottom: 2px solid #6A0DAD;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* Messages */
+.user-message, .kupido-message {
+    padding: 10px;
+    margin: 5px;
+    border-radius: 10px;
+    max-width: 80%;
+    word-wrap: break-word;
+    position: relative;
+    animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.user-message {
+    background: #6A0DAD;
+    color: white;
+    align-self: flex-end;
+    text-align: right;
+}
+
+.kupido-message {
+    background: #E0E0E0;
+    color: #333;
+    align-self: flex-start;
+    text-align: left;
+}
+
+.kupido-message::before {
+    content: '';
+    display: inline-block;
+    width: 30px;
+    height: 30px;
+    background: url('uploads/1648050060_cbslg.png') no-repeat center center;
+    background-size: cover;
+    border-radius: 50%;
+    margin-right: 10px;
+    vertical-align: middle;
+}
+
+/* Chat Footer */
+#kupido-footer {
+    display: flex;
+    padding: 10px;
+    background: rgba(75, 0, 130, 0.95);
+    border-radius: 0 0 20px 20px;
+}
+
+#kupido-input {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.95);
+    color: #333;
+    font-size: 14px;
+    margin-right: 10px;
+    outline: none;
+}
+
+#kupido-input::placeholder {
+    color: #999;
+}
+
+#kupido-footer button {
+    background: #FFBF00;
+    color: black;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: bold;
+    transition: background 0.3s ease;
+}
+
+#kupido-footer button:hover {
+    background: #FFA500;
+}
+
+/* Suggestions Dropdown */
+#suggestions-dropdown {
+    position: absolute;
+    bottom: 60px;
+    left: 10px;
+    right: 10px;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+    max-height: 150px;
+    overflow-y: auto;
+    z-index: 1001;
+    display: none;
+}
+
+.suggestion-item {
+    padding: 8px;
+    font-size: 14px;
+    color: #333;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.suggestion-item:hover {
+    background: #f0f0f0;
+}
+
+/* Chat Toggle Button */
+#kupido-toggle {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(106, 13, 173, 0.95);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 25px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+    transition: background 0.3s ease, transform 0.2s ease;
+    margin-bottom: 250px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+#kupido-toggle:hover {
+    background: rgba(75, 0, 130, 0.95);
+    transform: translateX(-50%) scale(1.05);
+}
+
+#kupido-toggle svg {
+    width: 20px;
+    height: 20px;
+    fill: white;
+}
+
+/* Scrollbar Styling */
+#kupido-body::-webkit-scrollbar {
+    width: 8px;
+}
+
+#kupido-body::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
+#kupido-body::-webkit-scrollbar-thumb {
+    background: rgba(106, 13, 173, 0.7);
+    border-radius: 10px;
+}
+
+#kupido-body::-webkit-scrollbar-thumb:hover {
+    background: rgba(75, 0, 130, 0.9);
+}
+#kupido-header span:hover {
+    transform: none;
+}
+</style>
+<link rel="icon" type="image/png" href="uploads/1648050060_cbslg.png">
+</head>
+<body>
+<?php $page = isset($_GET['p']) ? $_GET['p'] : 'home';  ?>
+<?php require_once('inc/topBarNav.php') ?>
+<div id="kupido-container">
+    <div id="kupido-header">
+        <span>Kupido - Your Assistant</span>
+        <span onclick="toggleKupido()" style="cursor: pointer;">&times;</span>
+    </div>
+    <div id="kupido-body"></div>
+    <div id="kupido-footer">
+        <input type="text" id="kupido-input" placeholder="Type here..." onkeypress="handleKupidoKey(event)" oninput="showSuggestions()">
+        <button onclick="sendKupidoMessage()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                <path d="M15.854.146a.5.5 0 0 1 .11.54l-5.819 14.547a.75.75 0 0 1-1.329.124l-3.178-4.995L.643 7.184a.75.75 0 0 1 .124-1.33L15.314.037a.5.5 0 0 1 .54.11zM6.636 10.07l2.761 4.338L14.13 2.576 6.636 10.07zm6.787-8.201L1.591 6.602l4.339 2.76 7.494-7.493z"/>
+            </svg>
+        </button>
+        <div id="suggestions-dropdown"></div>
+    </div>
+</div>
+<button id="kupido-toggle" onclick="toggleKupido()">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2h-4l-4 4-4-4H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2zm0 2v12h4.83L12 20.17 15.17 18H20V6H4zm2 4h12v2H6v-2zm0 4h8v2H6v-2z"/>
+    </svg>
+    Chat with Kupido
+</button>
+
+
+<script>
+const kupidoResponses = {
+    "hi": "Hello! How can I assist you today?",
+    "hello": "Hello! How can I assist you today?",
+    "who are you?": "I&#39;m Kupido, your smart assistant for cab bookings.",
+    "what is your name?": "My name is Kupido! I'm here to assist you.",
+    "how do i select a cab?": "Choose your preferred cab from the available options before confirming your ride.",
+    "can i schedule a ride in advance?": "Currently, we only support immediate bookings. Stay tuned for updates!",
+    "how do i track my cab?": "You can track your cab in real time from the 'My Bookings' section.",
+    "can i change my drop location after booking?": "No, drop location changes are not allowed after booking.",
+    "can i book a cab without an account?": "No, you need to sign up or log in to book a cab.",
+    "is there any additional charge?": "No hidden charges.",
+    "do i need to pay in advance?": "No, you can pay after the ride is completed.",
+    "how can i become a driver?": "Contact us , You can register as a driver.",
+    "what are the requirements to become a driver?": "You need a valid driver&#39;s license and vehicle details to register.",
+    "how do drivers get paid?": "Drivers receive payments via UPI or cash after completing rides.",
+    "how do i set my pickup location?": "Click on the location icon or type your address in the input field.",
+    "is this service available 24/7?": "Yes! Our cab booking service is available 24/7.",
+    "can i contact the driver?": "Yes, after booking, you will get the driver&#39;s contact details.",
+    "how do i give feedback?": "You can provide feedback after completing your ride.",
+    "is my data safe?": "Yes, we prioritize user privacy and security.",
+    "refund policy": "Refunds are processed only for eligible cancellations. Check our policy.",
+    "how do i get a refund?": "If eligible, refunds will be processed within 3-5 business days.",
+    "how to book a cab?": "Go to 'Available cabs', select pickup & drop locations, then confirm your ride.",
+    "payment options": "Cash only supported.",
+    "how much does a ride cost?": "Fare depends on distance. Check estimated price before booking.",
+    "is location access required?": "For best experience, enable location access for auto pickup.",
+    "driver details": "After booking, you can see your driver&#39;s name & contact.",
+    "can i cancel my ride?": "Yes! Cancel within 5 minutes after booking.",
+    "what if my driver cancels?": "You should book another cab.",
+    "any offers available?": "We offer discounts during festivals!",
+    "safety measures?": "Our cabs are sanitized, and drivers follow safety protocols.",
+    "what is kupido?": "I&#39;m your smart assistant, here to help with cab bookings.",
+    "default": "Sorry, I don&#39;t understand. Please ask something else!"
+};
+
+function sendKupidoMessage() {
+    let inputField = document.getElementById("kupido-input");
+    let userMessage = inputField.value.trim().toLowerCase();
+    if (userMessage === "") return;
+
+    appendKupidoMessage("You", userMessage);
+    setTimeout(() => {
+        let botReply = kupidoResponses[userMessage] || kupidoResponses["default"];
+        appendKupidoMessage("Kupido", botReply);
+    }, 1000);
+
+    inputField.value = "";
+    document.getElementById("suggestions-dropdown").style.display = "none";
+}
+
+function appendKupidoMessage(sender, message) {
+    let chatBody = document.getElementById("kupido-body");
+    let messageDiv = document.createElement("div");
+    messageDiv.classList.add(sender === "You" ? "user-message" : "kupido-message");
+    messageDiv.innerHTML = `<b>${sender}:</b> ${message}`;
+    chatBody.appendChild(messageDiv);
+    chatBody.scrollTop = chatBody.scrollHeight;
+}
+
+function handleKupidoKey(event) {
+    if (event.key === "Enter") {
+        sendKupidoMessage();
+    }
+}
+
+function showSuggestions() {
+    let inputField = document.getElementById("kupido-input");
+    let userInput = inputField.value.trim().toLowerCase();
+    let suggestionsDropdown = document.getElementById("suggestions-dropdown");
+
+    if (userInput === "") {
+        suggestionsDropdown.style.display = "none";
+        return;
+    }
+
+    let suggestions = Object.keys(kupidoResponses).filter(key => key.startsWith(userInput));
+
+    if (suggestions.length > 0) {
+        suggestionsDropdown.innerHTML = suggestions.map(suggestion => `
+            <div class="suggestion-item" onclick="selectSuggestion('${suggestion}')">${suggestion}</div>
+        `).join("");
+        suggestionsDropdown.style.display = "block";
+    } else {
+        suggestionsDropdown.style.display = "none";
+    }
+}
+
+function selectSuggestion(suggestion) {
+    let inputField = document.getElementById("kupido-input");
+    inputField.value = suggestion;
+    document.getElementById("suggestions-dropdown").style.display = "none";
+}
+
+function toggleKupido() {
+    let chatContainer = document.getElementById("kupido-container");
+    let toggleButton = document.getElementById("kupido-toggle");
+    if (chatContainer.style.display === "none") {
+        chatContainer.style.display = "block";
+        toggleButton.style.display = "none";
+    } else {
+        chatContainer.style.display = "none";
+        toggleButton.style.display = "block";
+    }
+}
+$(document).ready(function() {
+        $("#topNavBar").load("inc/topBarNav.php");
+    });
+</script>
+</body>
+</html>
