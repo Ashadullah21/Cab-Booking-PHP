@@ -1,5 +1,5 @@
 Database Name: cbsphp
-
+Folder : Database New
 Admin Login Details
 
 Username: admin
